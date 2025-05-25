@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+<style>
+header{
+
+}
+#colorbox{
+    width:80%;
+    height:300px;
+    background-color: rgb(255, 0, 0);
+    margin:10%;
+    border:3px solid black;
+    border-radius: 20px;
+    transition: background-color 0.01s;
+    cursor: pointer;
+}
+#start{
+    width:20%;
+    height:30px;
+    margin:20px auto;
+    border:3px solid black;
+    border-radius: 5px;
+    text-align: center;
+    font-size:20px;
+    cursor: pointer;
+}
+</style>
+    </head>
+    <body>
+        <header style="text-align: center; font-size:30px">순발력 테스트</header>
+    <hr>
+    <p>
+        
+    </p>  
+    <div id="start">시작</div>  
+    <div id="colorbox" style="text-align: center; color: white; font-size: 30px; "><strong>click</strong></div>
+    <div id="info" style="text-align:center; color:black;font-size: 20px;"><strong></strong></div> 
+   <script>
+const box = document.getElementById('colorbox');   // 색이 바뀌는 박스 요소 가져오기
+const info = document.getElementById('info');      // 결과나 메시지를 표시할 영역
+const startBtn = document.getElementById('start'); // '시작' 버튼 요소 가져오기
+
+let colorChangedTime = 0;     // 박스 색이 초록색으로 바뀐 시점의 시간 저장
+let isColorChanged = false;   // 박스 색이 초록색으로 바뀌었는지 여부
+let hasClicked = false;       // 박스를 이미 클릭했는지 여부 (중복 클릭 방지)
+let timeoutId = null;         // setTimeout ID 저장 (타이머 취소를 위해)
+let isStarted = false;        // 시작 버튼이 눌렸는지 여부 확인
+
+// '시작' 버튼을 클릭했을 때 실행되는 이벤트 리스너
+startBtn.addEventListener('click', () => {
+    info.textContent = "";                 // 안내 메시지 초기화
+    box.style.backgroundColor = "red";     // 박스 색을 초기 빨간색으로 설정
+    isColorChanged = false;                // 색 변경 여부 초기화
+    hasClicked = false;                    // 클릭 여부 초기화
+    isStarted = true;                      // 게임 시작 상태로 설정
+
+    const randomDelay = Math.random() * 10000; // 0~10초 사이 랜덤한 시간 생성
+
+    // 이전에 설정된 타이머가 있다면 제거 (중복 실행 방지)
+    if (timeoutId) {
+        clearTimeout(timeoutId);
+    }
+
+    // 일정 시간 후 박스 색을 초록색으로 변경하고 그 시점을 기록
+    timeoutId = setTimeout(() => {
+        box.style.backgroundColor = 'rgb(0,255,0)'; // 초록색으로 변경
+        colorChangedTime = Date.now();              // 현재 시간 기록
+        isColorChanged = true;                      // 색이 바뀌었다고 표시
+    }, randomDelay);
+});
+
+// 색깔 박스를 클릭했을 때 실행되는 이벤트 리스너
+box.addEventListener('click', () => {
+    // 시작하지 않았거나 이미 클릭한 경우 아무 작업도 하지 않음
+    if (!isStarted || hasClicked) return;
+
+    // 아직 초록색으로 바뀌지 않았다면 (즉, 너무 빨리 클릭했다면)
+    if (!isColorChanged) {
+        info.textContent = "너무 빨랐어요!"; // 경고 메시지 출력
+        hasClicked = true;                   // 다시 클릭하지 못하게 설정
+        clearTimeout(timeoutId);             // 초록색으로 바꾸는 타이머 취소
+    } else {
+        // 초록색으로 바뀐 후 클릭한 경우 (정상적인 반응)
+        const currentTime = Date.now();  // 클릭 시점의 시간 기록
+        const elapsedSeconds = ((currentTime - colorChangedTime) / 1000).toFixed(2); // 반응 시간 계산
+        info.textContent = `색이 바뀐 후 ${elapsedSeconds}초 후에 클릭했습니다.`; // 반응 시간 출력
+        hasClicked = true;               // 다시 클릭 못 하게 설정
+    }
+
+    isStarted = false; // 한 번 테스트가 끝났으므로 다시 시작해야 함
+});
+</script>
+    </body>
+</html>

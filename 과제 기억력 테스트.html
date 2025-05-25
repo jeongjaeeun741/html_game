@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang ="ko">
+<head>
+<meta charset="UTF-8">
+<title>색상 기억 게임</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;}
+
+  #mainScreen, #gameScreen {
+    display: none;}
+
+  #mainScreen.active, #gameScreen.active {
+    display: block;}
+
+  .colorBox {
+    width: 100px;
+    height: 100px;
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s;}
+
+  .show {
+    opacity: 1;}
+
+  button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;}
+
+  #message {
+    font-size: 20px;
+    margin: 20px 0;}
+</style>
+</head>
+<body>
+
+<div id="mainScreen" class="active">
+  <h1>🎯 기억력 테스트!</h1>
+  <p>색상을 보고 순서대로 기억해 맞춰보세요.</p>
+  <button onclick="goToGame()">게임 시작</button>
+</div>
+
+<div id="gameScreen">
+  <div id="message">색상을 기억하세요!</div>
+  <div id="colorContainer"></div>
+  <div>
+    <button onclick="startGame()">다시 시작</button>
+    <button onclick="goToMain()">처음으로 돌아가기</button>
+  </div>
+</div>
+
+<script>
+  const colors = ['red', 'green', 'blue', 'orange', 'yellow'];
+  let answer = [];
+  let userInput = [];
+
+  function goToGame() {
+    document.getElementById('mainScreen').classList.remove('active');
+    document.getElementById('gameScreen').classList.add('active');
+    startGame();}
+
+  function goToMain() {
+    document.getElementById('gameScreen').classList.remove('active');
+    document.getElementById('mainScreen').classList.add('active');
+    document.body.style.background = 'white';
+    document.getElementById('message').textContent = '';
+    document.getElementById('colorContainer').innerHTML = '';}
+
+  function showMessage(text) {
+    document.getElementById('message').textContent = text;}
+
+  function startGame() {
+    answer = colors.slice();
+    answer.sort(function() {
+      return Math.random() - 0.5; });
+      
+    userInput = [];
+    document.body.style.background = 'white';
+    showMessage('색상을 기억하세요!');
+
+    const container = document.getElementById('colorContainer');
+    container.innerHTML = '';
+
+    answer.forEach((color, i) => {
+      const box = document.createElement('div');
+      box.className = 'colorBox';
+      box.style.backgroundColor = color;
+      container.appendChild(box);
+
+      setTimeout(() => {
+        box.classList.add('show');
+        setTimeout(() => {
+          box.classList.remove('show');
+        }, 500);
+      }, i * 1000);
+    });
+
+    setTimeout(() => {
+      container.innerHTML = '';
+      showMessage('이제 순서대로 색상을 클릭하세요!');
+
+      const shuffled = [...colors].sort(() => Math.random() - 0.5);
+      shuffled.forEach(color => {
+        const box = document.createElement('div');
+        box.className = 'colorBox show';
+        box.style.backgroundColor = color;
+
+        box.onclick = () => {
+          userInput.push(color);
+          if (userInput.length === answer.length) {
+            checkAnswer();
+          }
+        };
+
+        container.appendChild(box);
+      });
+    }, answer.length * 1000 + 500);
+  }
+  function checkAnswer() {
+    const correct = answer.every((c, i) => c === userInput[i]);
+    if (correct) {
+      showMessage('정답입니다! 🎉');
+      document.body.style.background = '#d0f0c0';} 
+      else {
+      showMessage('틀렸어요. 다시 해보세요!');
+      document.body.style.background = '#ffd6d6';}
+
+    setTimeout(() => {
+      document.body.style.background = 'white';
+    }, 2000);}
+</script>
+</body>
+</html> 
